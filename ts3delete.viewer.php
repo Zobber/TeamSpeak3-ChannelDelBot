@@ -16,7 +16,8 @@
 		foreach ($row as $key => $value) {
 			if ((time() - $value['lastTime']) >= settingsTS3::WarnTime) {
 				$time = date('Y/m/d H:i:s', $value['lastTime'] + settingsTS3::DeleteTime);
-				$tmp .= "<tr><td>${value['channelID']}</td><td>${value['channelName']}</td><td>${time}</td></tr>";
+				$name = htmlspecialchars($value['channelName'], ENT_QUOTES, 'UTF-8');
+				$tmp .= "<tr><td>${value['channelID']}</td><td>${name}</td><td>${time}</td></tr>";
 			}
 		}
 	}
