@@ -10,40 +10,18 @@
 	$ts3del->db_table = settingsSQL::Table;
 	$ts3del->db_char  = settingsSQL::CharSet;
 
-	if (!empty($_GET['t']) && !empty($_GET['s'])) {
-		switch ($_GET['t']){
-			case 'cid':   $type = 'channelID'; break;
-			case 'cname': $type = 'channelName'; break;
-			case 'date':  $type = 'lastTime'; break;
-			default: break;
-		}
-
-		switch ($_GET['s']) {
-			case 'asc':  $sort = 'ASC'; break;
-			case 'desc': $sort = 'DESC'; break;
-			default: break;
-		}
-	} else {
-		$type = 'channelID';
-		$sort = 'ASC';
-	}
-
-	$rsrt = ($sort == 'DESC') ? 'asc' : 'desc';
-	$head = '<th><a href="./ts3delete.viewer.php?t=cid&s='.$rsrt.'">Channel ID</a></th>
-			<th><a href="./ts3delete.viewer.php?t=cname&s='.$rsrt.'">Channel Name</a></th>
-			<th><a href="./ts3delete.viewer.php?t=date&s='.$rsrt.'">Delete Date</a></th>';
-
-	$row  = $ts3del->getDbAllData($type, $sort);
+	$row  = $ts3del->getDbAllData();
 	$body = '';
 	if (is_array($row)) {
 		foreach ($row as $key => $value) {
 			if ((time() - $value['lastTime']) >= settingsTS3::WarnTime) {
-				$time  = date('Y/m/d H:i:s', $value['lastTime'] + settingsTS3::DeleteTime);
-				$name  = htmlspecialchars($value['channelName'], ENT_QUOTES, 'UTF-8');
-				$body .= "<tr><td>${value['channelID']}</td><td>${name}</td><td>${time}</td></tr>";
+				$time = date('Y/m/d H:i:s', $value['lastTime'] + settingsTS3::DeleteTime);
+				$name = htmlspecialchars($value['channelName'], ENT_QUOTES, 'UTF-8');
+				$tmp .= "<tr><td>${value['channelID']}</td><td>${name}</td><td>${time}</td></tr>";
 			}
 		}
 	}
+	$body = ($body == '') ? '<tr><td></td><td>Did not exist.</td><td></td></tr>' : $body;
 ?>
 <!doctype html>
 <html>
@@ -85,6 +63,10 @@
 			.table-hover > tbody > tr:hover > td {
 				background-color: #383838;
 			}
+
+			.sorthead {
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body>
@@ -97,12 +79,14 @@
 			<div class="row">
 				<div class="col-xs-12">
 					<div class="table-responsive">
-						<table class="table table-hover">
+						<table class="table table-hover" id="channelList">
 							<thead>
-								<?php echo $head ?>
+								<th class="sorthead" data-sort="int">Channel ID</th>
+								<th class="sorthead" data-sort="string">Channel Name</th>
+								<th class="sorthead" data-sort="string">Delete Date</th>
 							</thead>
 							<tbody>
-								<?php echo $body ?>
+								<?php echo $tmp ?>
 							</tbody>
 						</table>
 					</div>
@@ -121,7 +105,9 @@
 
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/stupidtable/0.0.1/stupidtable.min.js"></script>
 		<script>
+			$('#channelList').stupidtable();
 			/* footerFixed.js MIT-style license. 2007 Kazuma Nishihata [to-R] http://blog.webcreativepark.net */
 			new function(){function h(){document.getElementsByTagName("body");document.getElementById(a).style.top="0px";var d=document.getElementById(a).offsetTop,b=document.getElementById(a).offsetHeight;if(window.innerHeight){var f=window.innerHeight}else{document.documentElement&&0!=document.documentElement.clientHeight&&(f=document.documentElement.clientHeight)}d+b<f&&(document.getElementById(a).style.position="relative",document.getElementById(a).style.top=f-b-d-1+"px")}function c(g){var f=document.createElement("div"),i=document.createTextNode("S");f.appendChild(i);f.style.visibility="hidden";f.style.position="absolute";f.style.top="0";document.body.appendChild(f);var d=f.offsetHeight;setInterval(function(){d!=f.offsetHeight&&(g(),d=f.offsetHeight)},1000)}function e(f,g,j){try{f.addEventListener(g,j,!1)}catch(i){f.attachEvent("on"+g,j)}}var a="footer";e(window,"load",h);e(window,"load",function(){c(h)});e(window,"resize",h)};
 		</script>

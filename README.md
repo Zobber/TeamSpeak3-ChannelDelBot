@@ -15,24 +15,37 @@ cronに登録し、設定ファイルを少し書き換えるだけ。
 
 導入手順  
 1. DBにテーブルを作成  
-2. ファイルを転送  
-3. 設定ファイルを編集  
-4. cronに登録
+2. 設定ファイルを編集  
+3. ファイルを転送  
+4. cronに登録  
+5. アクセス制限
 
-
-**MySQLのデータベース作成サンプル**  
+1.  
+MySQLを使用するのでデータベースを作成後下記コマンドを入力しテーブルを作成してください。  
 テーブル名は設定ファイルで変更可能です。
 
     CREATE TABLE IF NOT EXISTS `list` (`channelID` int(11) NOT NULL, `channelName` text NOT NULL, `lastTime` bigint(20) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ALTER TABLE `list` ADD UNIQUE KEY `channelID` (`channelID`);
 
-**cron サンプル**  
-OSにより、phpのパス等が異なるので注意してください。
+2.  
+``ts3delete.settings.php`` を開き、編集後に保存してください。
+
+3.  
+FileZillaやWinSCP等でサーバに転送します。
+
+4.  
+cronに登録します。
+
+    $ crontab -e
+
+等でcronの設定を開きます。  
+OSにより、phpのパス等が異なるので注意してください。 ``/usr/bin/php`` / ``/usr/local/bin/php``
 
     */5	*	*	*	*	/usr/local/bin/php	/foo/var/ts3delete.cron.php	>/dev/null	2>&1
 
-**アクセス制限サンプル**  
-Bot本体にアクセス出来ないようにアクセス制限をしておくことをオススメします。
+5.  
+Bot本体にhttp経由でアクセスされるとデータベースや、TeamSpeak3サーバに負荷がかかる原因になってしまいます。  
+なのでBot本体へのアクセスは拒否してしまいましょう。
 
     # Apache ~2.2
     <Files ~ "^ts3delete\.cron\.php$">
@@ -47,9 +60,17 @@ Bot本体にアクセス出来ないようにアクセス制限をしておく�
 
 ----------
 
+Used library
+---
+
+ - ts3admin.class
+ - jQuery
+ - BootStrap 3
+ - Stupid-table-plugin
+ - footerFixed.js
 
 License
 -------
 
 GPL v3 License  
-please see LICENSE file.
+Please see LICENSE file.
