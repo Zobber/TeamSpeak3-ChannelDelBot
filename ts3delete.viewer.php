@@ -10,14 +10,37 @@
 	$ts3del->db_table = settingsSQL::Table;
 	$ts3del->db_char  = settingsSQL::CharSet;
 
-	$row = $ts3del->getDbAllData();
-	$tmp = '';
+	if (!empty($_GET['t']) && !empty($_GET['s'])) {
+		switch ($_GET['t']){
+			case 'cid':   $type = 'channelID'; break;
+			case 'cname': $type = 'channelName'; break;
+			case 'date':  $type = 'lastTime'; break;
+			default: break;
+		}
+
+		switch ($_GET['s']) {
+			case 'asc':  $sort = 'ASC'; break;
+			case 'desc': $sort = 'DESC'; break;
+			default: break;
+		}
+	} else {
+		$type = 'channelID';
+		$sort = 'ASC';
+	}
+
+	$rsrt = ($sort == 'DESC') ? 'asc' : 'desc';
+	$head = '<th><a href="./ts3delete.viewer.php?t=cid&s='.$rsrt.'">Channel ID</a></th>
+			<th><a href="./ts3delete.viewer.php?t=cname&s='.$rsrt.'">Channel Name</a></th>
+			<th><a href="./ts3delete.viewer.php?t=date&s='.$rsrt.'">Delete Date</a></th>';
+
+	$row  = $ts3del->getDbAllData($type, $sort);
+	$body = '';
 	if (is_array($row)) {
 		foreach ($row as $key => $value) {
 			if ((time() - $value['lastTime']) >= settingsTS3::WarnTime) {
-				$time = date('Y/m/d H:i:s', $value['lastTime'] + settingsTS3::DeleteTime);
-				$name = htmlspecialchars($value['channelName'], ENT_QUOTES, 'UTF-8');
-				$tmp .= "<tr><td>${value['channelID']}</td><td>${name}</td><td>${time}</td></tr>";
+				$time  = date('Y/m/d H:i:s', $value['lastTime'] + settingsTS3::DeleteTime);
+				$name  = htmlspecialchars($value['channelName'], ENT_QUOTES, 'UTF-8');
+				$body .= "<tr><td>${value['channelID']}</td><td>${name}</td><td>${time}</td></tr>";
 			}
 		}
 	}
@@ -76,10 +99,10 @@
 					<div class="table-responsive">
 						<table class="table table-hover">
 							<thead>
-								<th>Channel ID</th><th>Channel Name</th><th>Delete Date</th>
+								<?php echo $head ?>
 							</thead>
 							<tbody>
-								<?php echo $tmp ?>
+								<?php echo $body ?>
 							</tbody>
 						</table>
 					</div>

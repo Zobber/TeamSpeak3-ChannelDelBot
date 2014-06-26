@@ -37,10 +37,10 @@
 			return ($row == false) ? false : true;
 		}
 
-		public function getDbAllData()
+		public function getDbAllData($type='channelID', $sort='ASC')
 		{
 			$pdo = new PDO($this->PDOConnect(), $this->db_user, $this->db_pass);
-			$sth = $pdo->query('SELECT * FROM `'.$this->db_table.'`');
+			$sth = $pdo->query('SELECT * FROM `'.$this->db_table.'` ORDER BY '.$type.' '.$sort);
 			$row = $sth->fetchAll(PDO::FETCH_ASSOC);
 			$pdo = null;
 			return $row;
