@@ -44,7 +44,7 @@ cronに登録します。
 等でcronの設定を開きます。  
 OSにより、phpのパス等が異なるので注意してください。 ``/usr/bin/php`` / ``/usr/local/bin/php``
 
-    */5	*	*	*	*	/usr/local/bin/php	/foo/var/ts3delete.cron.php	>/dev/null	2>&1
+    */5	*	*	*	*	/usr/local/bin/php	/foo/var/ts3delete.cron.php	1> /dev/null
 
 Step5  
 Bot本体にhttp経由でアクセスされるとデータベースや、TeamSpeak3サーバに負荷がかかる原因になってしまいます。  
